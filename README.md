@@ -1,6 +1,8 @@
 # QUASAR-ARB · Quantum Core & Deep-Space DeFi Arbitrage Navigator
 AI Fundamentals final project: **A\* → Bayes → MDP** pipeline for DEX cycle arbitrage, with a living-galaxy web UI.
 
+**Live demo (static build, no server needed): https://ai-final-proj-dist.vercel.app**
+
 ## Run
 ```bash
 pip install fastapi uvicorn pytest playwright httpx
