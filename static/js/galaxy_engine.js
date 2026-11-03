@@ -323,11 +323,11 @@
         const R = cr[k * 3], G = cr[k * 3 + 1], B = cr[k * 3 + 2];
         const tw = 0.75 + 0.25 * Math.sin(this.t * 2 + k);
         const s = clamp(this.size[k] * (4 + Math.min(sc, 3) * 3), 6, 34);
-        ctx.globalAlpha = 0.75 * tw * (1 - 0.5 * p);
+        ctx.globalAlpha = 0.5 * tw * (1 - 0.6 * p);
         ctx.drawImage(glowSprite(R & 0xE0 | 16, G & 0xE0 | 16, B & 0xE0 | 16), x - s, y - s, s * 2, s * 2);
         if (streak > 0.03) {
           const dx = x - cx, dy = y - cy;
-          ctx.globalAlpha = Math.min(0.9, streak * 1.6);
+          ctx.globalAlpha = Math.min(0.32, streak * 0.7);
           ctx.strokeStyle = `rgb(${R},${G},${B})`; ctx.lineWidth = Math.min(3, 0.6 + sc * 0.5);
           ctx.beginPath(); ctx.moveTo(x - dx * streak * 0.9, y - dy * streak * 0.9); ctx.lineTo(x, y); ctx.stroke();
         }
@@ -353,7 +353,7 @@
       const base = 34 * sc;
       const R = Math.min(base, Math.min(this.W, this.H) * 0.62);
       const pulse = 0.88 + 0.12 * Math.sin(this.t * 2.3);
-      const comp = 1 - 0.4 * clamp(wv + wi + wx - 1, 0, 1), k = clamp(1.1 - p * 0.85, 0.22, 1) * comp;        // keep the deep UI readable
+      const comp = 1 - 0.55 * clamp(wv + wi + wx - 1, 0, 1), k = clamp(1.0 - p * 0.8, 0.2, 0.9) * comp;        // keep the deep UI readable
       const layer = (r, g, b, rad, alpha) => {
         const gr = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
         gr.addColorStop(0, `rgba(${r},${g},${b},${alpha})`); gr.addColorStop(0.35, `rgba(${r},${g},${b},${alpha * 0.35})`);
@@ -361,23 +361,23 @@
         ctx.fillStyle = gr; ctx.fillRect(cx - rad, cy - rad, rad * 2, rad * 2);
       };
       ctx.globalCompositeOperation = 'lighter';
-      if (wv > 0.01) layer(255, 220, 160, R * 3.2, 0.55 * wv * pulse * k);
-      if (wi > 0.01) layer(255, 70, 40, R * 3.8, 0.55 * wi * pulse * k);
-      if (wx > 0.01) { layer(157, 40, 255, R * 4.5, 0.4 * wx * k); layer(0, 240, 255, R * 2.0, 0.55 * wx * pulse * k); }
-      if (this.threat > 0.05 && (wx > 0.05 || wi > 0.05)) layer(255, 42, 84, R * 3.0, 0.4 * this.threat * pulse * Math.max(wx, wi) * k);
+      if (wv > 0.01) layer(255, 215, 160, R * 3.0, 0.34 * wv * pulse * k);
+      if (wi > 0.01) layer(255, 70, 40, R * 3.6, 0.36 * wi * pulse * k);
+      if (wx > 0.01) { layer(157, 40, 255, R * 4.2, 0.28 * wx * k); layer(0, 240, 255, R * 1.8, 0.36 * wx * pulse * k); }
+      if (this.threat > 0.05 && (wx > 0.05 || wi > 0.05)) layer(255, 42, 84, R * 3.0, 0.28 * this.threat * pulse * Math.max(wx, wi) * k);
       // relativistic jets
       const jl = R * (3 + 5 * Math.max(wx, 0.4)), jw = Math.max(2, R * 0.07);
       for (const dir of [-1, 1]) {
         const gr = ctx.createLinearGradient(cx, cy, cx, cy + dir * jl);
         const col = wx > wv ? '0,240,255' : wi > wv ? '255,110,60' : '170,200,255';
-        gr.addColorStop(0, `rgba(${col},${0.55 * k})`); gr.addColorStop(1, `rgba(${col},0)`);
+        gr.addColorStop(0, `rgba(${col},${0.34 * k})`); gr.addColorStop(1, `rgba(${col},0)`);
         ctx.fillStyle = gr;
         ctx.beginPath(); ctx.moveTo(cx - jw, cy); ctx.lineTo(cx - jw * 0.2, cy + dir * jl); ctx.lineTo(cx + jw * 0.2, cy + dir * jl); ctx.lineTo(cx + jw, cy); ctx.fill();
       }
       // accretion disk rings
       ctx.lineWidth = Math.max(1, R * 0.035);
       for (let i = 0; i < 6; i++) {
-        const rr = R * (0.35 + i * 0.16), a = (0.55 - i * 0.07) * k;
+        const rr = R * (0.35 + i * 0.16), a = (0.38 - i * 0.05) * k;
         ctx.strokeStyle = wx > 0.5 ? `rgba(${i % 2 ? '157,80,255' : '0,240,255'},${a})` : wi > 0.5 ? `rgba(255,${90 + i * 20},40,${a})` : `rgba(255,${200 - i * 10},${150 - i * 12},${a})`;
         ctx.beginPath(); ctx.ellipse(cx, cy, rr, rr * ct * 0.55, this.t * 0.08 * (i % 2 ? 1 : -1) * 0, 0, TAU); ctx.stroke();
       }
@@ -385,7 +385,7 @@
       ctx.globalCompositeOperation = 'source-over';
       ctx.fillStyle = '#000'; ctx.beginPath(); ctx.arc(cx, cy, R * 0.16, 0, TAU); ctx.fill();
       ctx.globalCompositeOperation = 'lighter';
-      ctx.strokeStyle = `rgba(255,255,255,${0.55 * k})`; ctx.lineWidth = Math.max(1, R * 0.02);
+      ctx.strokeStyle = `rgba(255,255,255,${0.4 * k})`; ctx.lineWidth = Math.max(1, R * 0.02);
       ctx.beginPath(); ctx.arc(cx, cy, R * 0.18, 0, TAU); ctx.stroke();
     }
   }

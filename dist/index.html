@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QUASAR-ARB · Quantum Core Navigator</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%2714%27 fill=%27%23FFB800%27/%3E%3Ccircle cx=%2716%27 cy=%2716%27 r=%276%27 fill=%27%23000%27/%3E%3C/svg%3E">
+<link rel="stylesheet" href="static/css/fonts.css">
+<link rel="stylesheet" href="static/vendor/katex/katex.min.css">
+<link rel="stylesheet" href="static/css/quantum.css">
+</head>
+<body data-trace="idle">
+<canvas id="galaxy" aria-label="Living spiral galaxy"></canvas>
+<div class="vignette"></div>
+<div class="scrim"></div>
+<div class="scanlines"></div>
+
+<header class="topbar">
+  <div class="brand"><span class="brand-mark"></span><div><b>QUASAR-ARB</b><small>QUANTUM CORE · DEEP-SPACE DeFi NAVIGATOR</small></div></div>
+  <nav class="scenarios" id="scenario-buttons" aria-label="Scenarios">
+    <button class="scn" data-scenario="alpha" title="Tranquil Nebula"><i>α</i><span>Tranquil Nebula</span></button>
+    <button class="scn" data-scenario="beta" title="MEV Supernova Trap"><i>β</i><span>MEV Supernova Trap</span></button>
+    <button class="scn" data-scenario="gamma" title="Gas Storm Eclipse"><i>γ</i><span>Gas Storm Eclipse</span></button>
+    <button class="scn" data-scenario="delta" title="Custom Manual Override"><i>δ</i><span>Manual Override</span></button>
+  </nav>
+  <div class="actions">
+    <button id="btn-run" class="btn primary">⟳ RUN PIPELINE</button>
+    <button id="btn-trace" class="btn glow">▶ QUANTUM TRACE</button>
+    <button id="btn-rubric" class="btn">☰ RUBRIC</button>
+    <button id="btn-log" class="btn">▤ MATH LOG</button>
+    <button id="btn-mute" class="btn icon" title="Toggle sound" aria-label="Toggle sound">🔊</button>
+  </div>
+</header>
+
+<div class="kpis" id="kpis">
+  <div class="kpi"><label>SCENARIO</label><b id="kpi-scn">—</b></div>
+  <div class="kpi"><label>A* ROUTE</label><b id="tel-route">—</b></div>
+  <div class="kpi"><label>NET PROFIT</label><b id="tel-profit" class="num">—</b></div>
+  <div class="kpi"><label>p<sub>trap</sub> = P(H₁|E)</label><b id="tel-ptrap" class="num">—</b></div>
+  <div class="kpi"><label>MDP ACTION</label><b id="tel-action">—</b></div>
+</div>
+
+<div class="stagebar" id="stagebar" aria-live="polite">
+  <div class="stage" data-stage="1"><i>1</i>A* WORMHOLE SCAN</div>
+  <div class="stage" data-stage="2"><i>2</i>BAYESIAN SPECTRAL TELEMETRY</div>
+  <div class="stage" data-stage="3"><i>3</i>MDP BELLMAN COLLAPSE</div>
+  <div class="stage" data-stage="4"><i>4</i>ATOMIC BLOCK EXECUTION</div>
+</div>
+
+<aside class="rail" aria-label="Depth">
+  <div class="rail-line"><div class="rail-fill" id="rail-fill"></div></div>
+  <div class="rail-ticks">
+    <button data-goto="1" class="tick"><b>L1</b><small>OUTER RIM</small></button>
+    <button data-goto="2" class="tick"><b>L2</b><small>ACCRETION DISK</small></button>
+    <button data-goto="3" class="tick"><b>L3</b><small>SINGULARITY</small></button>
+  </div>
+  <div class="rail-read">z <b id="z-read">1000</b><br><span id="fps-read">—</span> fps<br><span id="pcount">—</span> ptcl</div>
+</aside>
+
+<main id="main">
+  <!-- ================= LAYER 1 ================= -->
+  <section class="layer" id="layer1" data-layer="1">
+    <div class="layer-head"><span class="eyebrow">DEPTH LAYER 1 · 0–33 % · z 1000 → 340</span>
+      <h2>OUTER RIM <em>Macro Liquidity Constellation &amp; A* Graph Topology</em></h2></div>
+    <div class="grid g-l1">
+      <article class="panel" id="panel-constellation">
+        <div class="panel-title"><span>LIQUIDITY CONSTELLATION</span><div class="chips" id="legend"></div><button class="btn small" id="btn-replay">▶ REPLAY A* SCAN</button></div>
+        <div class="stage-wrap"><canvas id="constellation"></canvas><div class="tip" id="ctip"></div></div>
+        <div class="panel-foot" id="const-foot">Hover a conduit or star · click a star to isolate its pools · drag the spectral scrubber to re-light the graph</div>
+      </article>
+      <article class="panel" id="panel-astar">
+        <div class="panel-title"><span>ALGORITHM 1 · A* vs BFS</span><button class="btn small" data-inspect="astar">⌕ INSPECT</button></div>
+        <div class="route-line" id="route-line"></div>
+        <div class="stats">
+          <div><label>NET PROFIT</label><b id="a-profit" class="num">—</b></div>
+          <div><label>YIELD</label><b id="a-bps" class="num">—</b></div>
+          <div><label>GAS</label><b id="a-gas" class="num">—</b></div>
+          <div><label>HOPS</label><b id="a-hops" class="num">—</b></div>
+        </div>
+        <div class="vs" id="vs-bars"></div>
+        <div class="formula" id="f-astar"></div>
+        <div class="tabs"><span class="tab-h">PRIORITY-QUEUE TRACE · open_set · g · h · f</span></div>
+        <div class="table-wrap trace-wrap"><table class="mono" id="trace-table"><thead><tr><th>#</th><th>pop path</th><th>g(n)</th><th>h(n)</th><th>f(n)</th><th>|open|</th><th>best in open</th></tr></thead><tbody></tbody></table></div>
+        <div class="table-wrap"><table class="mono" id="legs-table"><thead><tr><th>hop</th><th>pool</th><th>in</th><th>out (net)</th><th>impact</th><th>gas</th><th>w=−ln r</th></tr></thead><tbody></tbody></table></div>
+        <p class="why" id="why-astar"></p>
+        <div class="inspect" id="inspect-astar"></div>
+      </article>
+    </div>
+    <article class="panel deck" id="panel-deck">
+      <div class="panel-title"><span>CONTROL DECK · DELTA MANUAL OVERRIDE</span><small class="dim">any change switches to Scenario Delta and re-runs the whole pipeline</small></div>
+      <div class="deck-grid">
+        <label class="ctl">Trade capital <b id="v-capital">$50,000</b><input type="range" id="in-capital" min="1000" max="250000" step="1000" value="50000"></label>
+        <label class="ctl">Prior P(H₁) <b id="v-prior">0.10</b><input type="range" id="in-prior" min="0" max="0.95" step="0.01" value="0.10"></label>
+        <label class="ctl">Gas price <b id="v-gas">20 gwei</b><input type="range" id="in-gas" min="1" max="400" step="1" value="20"></label>
+        <label class="ctl">Discount γ <b id="v-gamma">0.95</b><input type="range" id="in-gamma" min="0" max="0.99" step="0.01" value="0.95"></label>
+        <label class="ctl">Market dislocation × <b id="v-disl">1.0</b><input type="range" id="in-disl" min="0" max="3" step="0.1" value="1"></label>
+        <div class="ctl checks"><span>Mempool sensors fired</span>
+          <label><input type="checkbox" id="sn-gas_priority_spike"> Gas_Priority_Spike</label>
+          <label><input type="checkbox" id="sn-mev_bot_signature"> Known_MEV_Bot_Signature</label>
+          <label><input type="checkbox" id="sn-pool_imbalance_shock"> Pool_Imbalance_Shock</label></div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ================= LAYER 2 ================= -->
+  <section class="layer" id="layer2" data-layer="2">
+    <div class="layer-head"><span class="eyebrow">DEPTH LAYER 2 · 34–66 % · z 340 → 120</span>
+      <h2>ACCRETION DISK <em>Mempool Radiation Field &amp; Bayesian Telemetry Scanner</em></h2></div>
+    <div class="grid g-l2">
+      <article class="panel" id="panel-radiation">
+        <div class="panel-title"><span>MEMPOOL RADIATION FIELD</span><span class="pill" id="verdict-pill">—</span></div>
+        <canvas id="radiation"></canvas>
+        <div class="sensors" id="sensor-list"></div>
+      </article>
+      <article class="panel" id="panel-bayes">
+        <div class="panel-title"><span>ALGORITHM 2 · EXACT BAYESIAN INFERENCE</span><button class="btn small" data-inspect="bayes">⌕ INSPECT</button></div>
+        <div class="bayes-top">
+          <div class="gauge"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" class="g-bg"/><circle cx="60" cy="60" r="50" class="g-fg" id="gauge-fg" transform="rotate(-90 60 60)"/></svg><div class="g-text"><b id="b-post" class="num">—</b><small>P(H₁|E)</small></div></div>
+          <div class="stats two">
+            <div><label>PRIOR P(H₁)</label><b id="tel-prior" class="num">—</b></div>
+            <div><label>P(E|H₁)</label><b id="b-l1" class="num">—</b></div>
+            <div><label>P(E|H₀)</label><b id="b-l0" class="num">—</b></div>
+            <div><label>MARGINAL P(E)</label><b id="tel-marginal" class="num">—</b></div>
+          </div>
+        </div>
+        <div class="formula big" id="f-bayes"></div>
+        <svg id="chain" class="chain" viewBox="0 0 640 170" preserveAspectRatio="none"></svg>
+        <div class="table-wrap"><table class="mono" id="seq-table"><thead><tr><th>sensor</th><th>reading</th><th>P(e|H₁)</th><th>P(e|H₀)</th><th>LR</th><th>P(E)</th><th>posterior</th></tr></thead><tbody></tbody></table></div>
+        <div class="waves" id="waves"></div>
+        <p class="why" id="why-bayes"></p>
+        <div class="inspect" id="inspect-bayes"></div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= LAYER 3 ================= -->
+  <section class="layer" id="layer3" data-layer="3">
+    <div class="layer-head"><span class="eyebrow">DEPTH LAYER 3 · 67–100 % · z 120 → 50</span>
+      <h2>SINGULARITY CORE <em>Quantum MDP Decision Matrix &amp; Atomic Execution Reactor</em></h2></div>
+    <div class="grid g-l3">
+      <article class="panel" id="panel-mdp">
+        <div class="panel-title"><span>ALGORITHM 3 · MARKOV DECISION PROCESS</span><button class="btn small" data-inspect="mdp">⌕ INSPECT</button></div>
+        <div class="stats">
+          <div><label>BELIEF b(s₀)</label><b id="m-b0" class="num">—</b></div>
+          <div><label>BELIEF b(s₁)</label><b id="m-b1" class="num">—</b></div>
+          <div><label>VI SWEEPS</label><b id="tel-iter" class="num">—</b></div>
+          <div><label>γ</label><b id="m-gamma" class="num">—</b></div>
+        </div>
+        <div class="tabs"><span class="tab-h">Q*(s,a) MATRIX · ★ = π*(s)</span></div>
+        <div class="table-wrap qwrap"><table class="qmat mono" id="qmat"><thead></thead><tbody></tbody></table></div>
+        <div class="tabs"><span class="tab-h">ONE-STEP EXPECTED UTILITY  EU(a)=Σ P(s|E) Σ T·R   vs   BELLMAN  Σ b(s)Q*(s,a)</span></div>
+        <div id="eu-bars" class="eu-bars"></div>
+        <div class="formula" id="f-mdp"></div>
+        <div class="table-wrap vi-wrap"><table class="mono" id="vi-table"><thead><tr><th>k</th><th>V(s₀)</th><th>V(s₁)</th><th>Δ</th></tr></thead><tbody></tbody></table></div>
+        <p class="why" id="why-mdp"></p>
+        <div class="inspect" id="inspect-mdp"></div>
+      </article>
+      <article class="panel reactor-panel" id="panel-reactor">
+        <div class="panel-title"><span>ATOMIC EXECUTION REACTOR</span><span class="pill" id="exec-pill">—</span></div>
+        <svg id="reactor" viewBox="0 0 300 300"></svg>
+        <div class="verdict" id="exec-verdict">—</div>
+        <ol class="txplan" id="txplan"></ol>
+        <div class="stats two">
+          <div><label>EXPECTED VALUE</label><b id="tel-ev" class="num">—</b></div>
+          <div><label>BRIBE</label><b id="x-bribe" class="num">—</b></div>
+        </div>
+      </article>
+    </div>
+    <footer class="foot">QUASAR-ARB · AI Fundamentals final project · A* → Bayes → MDP · all numbers are computed by the engine in <code>core/</code> (Python) or its 1:1 JS port in the static build</footer>
+  </section>
+</main>
+
+<div class="spectral" id="spectral">
+  <div class="spec-labels" id="spec-labels">
+    <button data-w="0">VISIBLE <small>Optical · 550 nm</small></button>
+    <button data-w="1">INFRARED <small>Slippage heat · 10 µm</small></button>
+    <button data-w="2">X-RAY <small>MEV / mempool radiation · 1 nm</small></button>
+    <button data-w="3">MULTI-WAVELENGTH <small>Quantum composite</small></button>
+  </div>
+  <input id="wave-slider" type="range" min="0" max="3" step="0.01" value="0" aria-label="Wavelength slider">
+</div>
+
+<aside class="drawer" id="rubric" aria-hidden="true">
+  <div class="drawer-head"><b>COURSE RUBRIC INSPECTOR</b><button class="btn small" id="rubric-close">✕</button></div>
+  <p class="dim">Input → Key calculation steps → Output → One-sentence explanation, for every required algorithm.</p>
+  <div id="rubric-body"></div>
+</aside>
+
+<aside class="logdock" id="logdock" aria-hidden="true">
+  <div class="drawer-head"><b>LIVE MATH LOG</b><button class="btn small" id="log-clear">CLEAR</button></div>
+  <pre id="mathlog"></pre>
+</aside>
+
+<script src="static/vendor/katex/katex.min.js"></script>
+<script src="static/js/galaxy_engine.js"></script>
+<script src="static/js/constellation.js"></script>
+<script src="static/js/data.js"></script>
+<script src="static/js/engine.js"></script>
+<script src="static/js/app.js"></script>
+</body>
+</html>

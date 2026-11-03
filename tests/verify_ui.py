@@ -39,7 +39,17 @@ def num(text):
     return float(m.group(0).replace(",", "")) if m else float("nan")
 
 
-def start_server(url):
+def start_server(url, static=False):
+    if static:
+        port = free_port(); url = f"http://127.0.0.1:{port}"
+        proc = subprocess.Popen([sys.executable, "-m", "http.server", str(port), "--bind", "127.0.0.1", "--directory", str(ROOT / "dist")],
+                                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        for _ in range(40):
+            try:
+                urllib.request.urlopen(url + "/", timeout=1); return proc, url
+            except Exception:
+                time.sleep(0.25)
+        raise RuntimeError("static server did not start")
     try:
         urllib.request.urlopen(url + "/", timeout=2); return None, url
     except Exception:
@@ -76,10 +86,13 @@ def wait_idle(page):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--url", default="http://127.0.0.1:8000")
+    ap.add_argument("--static", action="store_true", help="test the serverless dist/ build (no Python API)")
     ap.add_argument("--out", default=str(ROOT / "screenshots"))
     args = ap.parse_args()
     out = Path(args.out); out.mkdir(parents=True, exist_ok=True)
-    proc, url = start_server(args.url)
+    proc, url = start_server(args.url, args.static)
+    if args.static:
+        print(f"[static build] serving dist/ at {url} — no /api endpoint exists there")
     errors = []
     try:
         with sync_playwright() as p:

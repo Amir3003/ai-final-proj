@@ -6,9 +6,19 @@ AI Fundamentals final project: **A\* → Bayes → MDP** pipeline for DEX cycle 
 pip install fastapi uvicorn pytest playwright httpx
 python app.py --cli                  # terminal report, all 4 scenarios (add --scenario beta for one)
 python app.py --serve --port 8000    # web UI at http://127.0.0.1:8000  (fonts + KaTeX are vendored, works offline)
-pytest tests/test_algorithms.py -v   # 66 tests
+pytest tests -v                      # 68 tests (66 algorithm/API + 2 JS-parity; parity needs node)
 python tests/verify_ui.py            # Playwright run (starts its own server) -> screenshots/
 ```
+
+## Static build (no Python server) — deploy on Vercel
+```bash
+python static-build/build_static.py   # regenerates dist/ (committed, ready to deploy)
+```
+`dist/` is a fully client-side copy: all 4 scenarios and the live Manual-Override sliders run on `static-build/engine.js`, a 1:1 JS port of `core/`
+(reference data is exported from the Python modules, so Python stays the single source of truth; `tests/test_static_parity.py` deep-compares
+both engines on the 4 presets + 25 random overrides). `app.py` and `core/` are untouched by it.
+Vercel: import the repo, set **Root Directory = `dist`**, Framework = Other (no build command). Or: `cd dist && npx vercel --prod`.
+Test it: `python tests/verify_ui.py --static`.
 
 ## Algorithms (all in `core/`)
 **1. A\* + BFS (`graph_search.py`)** — 8 tokens, 14 pools = 28 directed edges, fees 0.05/0.30/1.00 %.

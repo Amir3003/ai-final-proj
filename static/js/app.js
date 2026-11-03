@@ -110,9 +110,13 @@
   async function run(scenario, { quiet = false } = {}) {
     QA.busy = true; document.body.dataset.busy = '1';
     const body = scenario === 'delta' ? Object.assign({ scenario: 'delta', market: QA.market }, readDeck()) : { scenario };
-    const r = await fetch('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-    if (!r.ok) { QA.busy = false; document.body.dataset.busy = '0'; throw new Error('API ' + r.status); }
-    const res = await r.json();
+    let res;
+    if (window.QUASAR_LOCAL) { res = window.QUASAR_LOCAL(body); }          // static build: pure client-side engine
+    else {
+      const r = await fetch('/api/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      if (!r.ok) { QA.busy = false; document.body.dataset.busy = '0'; throw new Error('API ' + r.status); }
+      res = await r.json();
+    }
     QA.scenario = scenario; QA.res = res; if (scenario !== 'delta') QA.market = res.params.market;
     render(res);
     QA.busy = false; document.body.dataset.busy = '0'; document.body.dataset.ready = '1';
